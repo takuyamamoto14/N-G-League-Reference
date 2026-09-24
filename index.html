@@ -1,0 +1,465 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="glean-artifact-type" content="dashboards">
+<meta name="glean-artifact-type" content="tracker_tables">
+<title>Navy &amp; Goldschmidt · Fantasy Baseball League History</title>
+<meta name="description" content="Navy & Goldschmidt fantasy baseball league history: champions, runner-ups, Sackos, owner records and era-adjusted scoring since 2014.">
+<meta property="og:title" content="Navy & Goldschmidt · League History">
+<meta property="og:description" content="Champions, Sackos, owner records and era-adjusted scoring since 2014.">
+<meta name="theme-color" content="#07090d">
+<style>
+:root{
+  --artifact-background:#07090d;
+  --artifact-background-light:#0b0f15;
+  --artifact-background-mid:#10151d;
+  --artifact-track:#171c25;
+  --artifact-border-light:#242a34;
+  --artifact-border-dark:#303745;
+  --artifact-text-primary:#f2f4f7;
+  --artifact-text-secondary:#9ba3b2;
+  --artifact-text-faint:#6f7888;
+  --artifact-gold:#e7b93f;
+  --artifact-gold-wash:rgba(231,185,63,.09);
+  --artifact-silver:#a3aec0;
+  --artifact-silver-wash:rgba(139,151,170,.09);
+  --artifact-red:#ff6b70;
+  --artifact-red-wash:rgba(255,107,112,.09);
+  --artifact-blue:#6b98ff;
+  --artifact-green:#67d49b;
+  --artifact-glow:rgba(231,185,63,.10);
+  --artifact-nav:rgba(7,9,13,.88);
+  --artifact-highlight:rgba(107,152,255,.16);
+  --artifact-highlight-edge:#6b98ff;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:72px}
+body{margin:0;background:radial-gradient(1000px 420px at 50% -180px,var(--artifact-glow),transparent 65%),var(--artifact-background);color:var(--artifact-text-primary);font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;font-size:15px;line-height:1.5;-webkit-font-smoothing:antialiased}
+.mono,.eyebrow,.label,.count,th,.tag{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+.wrap{max-width:1100px;margin:0 auto;padding:36px 22px 72px}
+.eyebrow{font-size:12px;font-weight:600;letter-spacing:.15em;text-transform:uppercase;color:var(--artifact-text-secondary)}
+h1{font-size:clamp(42px,7vw,72px);line-height:.98;font-weight:500;letter-spacing:-.045em;margin:18px 0 18px}
+h1 span{color:var(--artifact-text-secondary)}
+.lede{max-width:640px;color:var(--artifact-text-secondary);font-size:16px;margin:0}
+.dot{width:8px;height:8px;border-radius:50%;display:inline-block;background:var(--artifact-gold);flex:none}
+.dot.silver{background:var(--artifact-silver)}.dot.red{background:var(--artifact-red)}
+nav.toc{display:flex;gap:6px;border-top:1px solid var(--artifact-border-light);border-bottom:1px solid var(--artifact-border-light);padding:10px 0;margin:30px 0 26px;position:sticky;top:0;background:var(--artifact-nav);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);z-index:20;overflow-x:auto}
+nav.toc a{color:var(--artifact-text-secondary);text-decoration:none;padding:8px 14px;border-radius:10px;border:1px solid transparent;font-weight:600;font-size:14px;white-space:nowrap}
+nav.toc a:hover,nav.toc a.active{background:var(--artifact-background-mid);border-color:var(--artifact-border-dark);color:var(--artifact-text-primary)}
+.headlines{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+.card{background:var(--artifact-background-light);border:1px solid var(--artifact-border-light);border-radius:14px;padding:22px}
+.label{font-size:12px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--artifact-gold);margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.label.red{color:var(--artifact-red)}.label.blue{color:var(--artifact-blue)}.label.silver{color:var(--artifact-silver)}.label.green{color:var(--artifact-green)}
+.headline-name{font-size:22px;font-weight:650;letter-spacing:-.01em;line-height:1.25}
+.headline-sub{color:var(--artifact-text-secondary);font-size:14px;margin-top:6px}
+section{margin-top:52px}
+.section-head{display:flex;justify-content:space-between;gap:16px;align-items:flex-end;flex-wrap:wrap;margin-bottom:16px}
+.section-head h2{font-size:30px;font-weight:550;letter-spacing:-.025em;margin:0}
+.section-head p{margin:6px 0 0;color:var(--artifact-text-secondary);font-size:14px;max-width:620px}
+.sub-head{display:flex;justify-content:space-between;gap:12px;align-items:flex-end;margin:34px 0 12px}
+.sub-head h3{font-size:19px;font-weight:600;margin:0;letter-spacing:-.01em}
+.count{font-size:12px;font-weight:600;letter-spacing:.12em;color:var(--artifact-text-secondary);text-transform:uppercase}
+.controls{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.controls label{font-size:13px;color:var(--artifact-text-secondary)}
+select{background:var(--artifact-background-mid);color:var(--artifact-text-primary);border:1px solid var(--artifact-border-dark);border-radius:9px;padding:8px 10px;font:inherit;font-size:14px}
+.seg{display:inline-flex;border:1px solid var(--artifact-border-dark);border-radius:10px;overflow:hidden}
+.seg button{background:transparent;color:var(--artifact-text-secondary);border:0;padding:8px 13px;font:inherit;font-size:13px;font-weight:600;cursor:pointer}
+.seg button[aria-pressed="true"]{background:var(--artifact-background-mid);color:var(--artifact-text-primary)}
+.seg button:focus-visible,select:focus-visible,nav.toc a:focus-visible,th button:focus-visible{outline:2px solid var(--artifact-blue);outline-offset:2px}
+.legend{display:flex;gap:18px;flex-wrap:wrap;margin-top:12px;font-size:13px;color:var(--artifact-text-secondary)}
+.legend span{display:inline-flex;align-items:center;gap:7px}
+.table-wrap{overflow:auto;border:1px solid var(--artifact-border-light);border-radius:12px;background:var(--artifact-background-light)}
+table{width:100%;border-collapse:collapse}
+.history{min-width:960px}
+th,td{padding:12px 12px;border-bottom:1px solid var(--artifact-border-light);text-align:left;font-size:14px;vertical-align:top}
+th{font-size:11.5px;font-weight:650;letter-spacing:.12em;text-transform:uppercase;color:var(--artifact-text-secondary);background:var(--artifact-background-light);position:sticky;top:0;z-index:1}
+tbody tr:last-child td{border-bottom:0}
+td.year{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:13px;white-space:nowrap;color:var(--artifact-text-primary)}
+td.num{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+th.num{text-align:right}
+.champ{background:var(--artifact-gold-wash)}.runner{background:var(--artifact-silver-wash)}.sacko{background:var(--artifact-red-wash)}
+.owner-cell{display:flex;align-items:center;gap:8px;font-weight:600;white-space:nowrap}
+.team{color:var(--artifact-text-primary)}
+.tag{display:inline-block;margin-left:8px;font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--artifact-text-secondary);border:1px solid var(--artifact-border-dark);border-radius:6px;padding:1px 6px;vertical-align:1px}
+tr.hl td{box-shadow:inset 0 1px 0 var(--artifact-highlight-edge),inset 0 -1px 0 var(--artifact-highlight-edge)}
+tr.dim td{opacity:.35}
+.mark{background:var(--artifact-highlight);border-radius:5px;padding:0 4px;margin:0 -4px}
+.owner-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+.owner{border:1px solid var(--artifact-border-light);border-radius:12px;padding:15px 16px;background:var(--artifact-background-light)}
+.owner .n{font-weight:650;font-size:15.5px}
+.owner .meta{color:var(--artifact-text-secondary);font-size:12.5px;margin-top:2px}
+.owner .stats{display:flex;gap:16px;margin-top:10px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:13px;font-weight:600}
+.owner .stats span{display:inline-flex;align-items:center;gap:6px}
+.grid3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+.grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.bars{display:flex;flex-direction:column;gap:10px}
+.bar-row{display:grid;grid-template-columns:minmax(118px,1.1fr) 2fr 30px;gap:10px;align-items:center;font-size:14px}
+.bar-row.wide{grid-template-columns:minmax(118px,1fr) 2.4fr 74px}
+.bar-name{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bar-name small{color:var(--artifact-text-faint);font-size:12px;margin-left:5px}
+.bar-val{text-align:right;font-weight:650;font-variant-numeric:tabular-nums;font-size:13.5px}
+.track{height:14px;background:var(--artifact-track);border:1px solid var(--artifact-border-light);border-radius:999px;overflow:hidden;position:relative}
+.fill{height:100%;border-radius:999px;background:var(--artifact-gold);width:0;transition:width .7s cubic-bezier(.2,.7,.2,1)}
+.fill.red{background:var(--artifact-red)}.fill.silver{background:var(--artifact-silver)}
+.track.div::after{content:"";position:absolute;left:50%;top:-2px;bottom:-2px;width:1px;background:var(--artifact-text-faint)}
+.track.div .fill{position:absolute;top:0}
+.fill.pos{background:var(--artifact-green)}.fill.neg{background:var(--artifact-red)}
+.axis{display:grid;grid-template-columns:minmax(118px,1fr) 2.4fr 74px;gap:10px;font-size:11.5px;color:var(--artifact-text-faint);margin-top:4px}
+.axis div:nth-child(2){display:flex;justify-content:space-between}
+.note{color:var(--artifact-text-secondary);font-size:13px;margin-top:12px}
+.heat{min-width:880px}
+.heat td,.heat th{padding:9px 8px;text-align:center;font-size:12.5px}
+.heat th:first-child,.heat td:first-child{text-align:left;position:sticky;left:0;background:var(--artifact-background-light);z-index:2;white-space:nowrap;font-size:13.5px}
+.heat td.cell{font-variant-numeric:tabular-nums;border-left:1px solid var(--artifact-border-light)}
+.heat td.empty{color:var(--artifact-text-faint)}
+.heat td.avg{font-weight:700;border-left:1px solid var(--artifact-border-dark)}
+.scores{min-width:900px}
+.scores th button{all:unset;cursor:pointer;display:inline-flex;gap:4px;align-items:center}
+.scores th[aria-sort] button::after{content:"";font-size:10px}
+.scores th[aria-sort="descending"] button::after{content:"▼"}
+.scores th[aria-sort="ascending"] button::after{content:"▲"}
+.scores td.rank{color:var(--artifact-text-secondary);font-family:ui-monospace,SFMono-Regular,Menlo,monospace;width:40px}
+.pos-t{color:var(--artifact-green)}.neg-t{color:var(--artifact-red)}
+.info{position:relative;display:inline-flex;align-items:center;justify-content:center;width:17px;height:17px;border-radius:50%;border:1px solid var(--artifact-border-dark);color:var(--artifact-text-secondary);font-size:11px;font-family:Inter,system-ui,sans-serif;font-weight:600;letter-spacing:0;text-transform:none;cursor:help;flex:none}
+.info:focus-visible{outline:2px solid var(--artifact-blue);outline-offset:2px}
+.info .tip{position:absolute;left:50%;bottom:calc(100% + 8px);transform:translateX(-50%);width:260px;background:var(--artifact-background-mid);color:var(--artifact-text-primary);border:1px solid var(--artifact-border-dark);border-radius:10px;padding:10px 12px;font-size:12.5px;line-height:1.45;font-weight:400;opacity:0;pointer-events:none;transition:opacity .15s;z-index:30;text-align:left}
+.info:hover .tip,.info:focus .tip{opacity:1}
+footer{margin-top:60px;padding-top:22px;border-top:1px solid var(--artifact-border-light);color:var(--artifact-text-faint);font-size:13px;display:grid;gap:6px}
+.reveal{opacity:0;transform:translateY(8px);animation:rise .55s ease forwards}
+@keyframes rise{to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){.reveal{animation:none;opacity:1;transform:none}.fill{transition:none}html{scroll-behavior:auto}}
+@media screen and (max-width:900px){.headlines,.grid3,.grid2{grid-template-columns:1fr}.owner-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.wrap{padding:26px 16px 56px}}
+@media screen and (max-width:560px){.owner-grid{grid-template-columns:1fr}.card{padding:18px}.section-head h2{font-size:25px}.bar-row,.bar-row.wide,.axis{grid-template-columns:100px 1fr 62px}.info .tip{left:auto;right:-10px;transform:none;width:220px}}
+@media print{
+  @page{margin:.5in}
+  :root{--artifact-background:#fff;--artifact-background-light:#fff;--artifact-background-mid:#f3f4f6;--artifact-track:#eef0f3;--artifact-border-light:#dfe2e7;--artifact-border-dark:#c9ced6;--artifact-text-primary:#111;--artifact-text-secondary:#555;--artifact-text-faint:#777;--artifact-gold:#b8860b;--artifact-gold-wash:rgba(184,134,11,.10);--artifact-silver:#7a8596;--artifact-silver-wash:rgba(122,133,150,.10);--artifact-red:#d63c43;--artifact-red-wash:rgba(214,60,67,.08);--artifact-green:#1f9d63;--artifact-blue:#2f5fd0;--artifact-glow:transparent;--artifact-nav:#fff}
+  body{background:#fff;color:#111;print-color-adjust:exact;-webkit-print-color-adjust:exact}
+  .wrap{max-width:100%;padding:0}
+  nav.toc,.controls,.info{display:none !important}
+  section{margin-top:26px}
+  .card,.owner,.table-wrap{break-inside:avoid}
+  .table-wrap{overflow:visible}
+  .history,.heat,.scores{min-width:0}
+  th{position:static}
+  .heat th:first-child,.heat td:first-child{position:static}
+  .reveal{opacity:1 !important;transform:none !important;animation:none !important}
+  .fill{transition:none !important}
+  *,*::before,*::after{animation:none !important;transition:none !important}
+  @page { size: auto !important; }
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header data-glean-id="hero">
+    <div class="eyebrow">Navy &amp; Goldschmidt · Fantasy Baseball · Est. 2014</div>
+    <h1>Navy &amp; Goldschmidt.<br><span>League history.</span></h1>
+    <p class="lede">Every champion, runner-up and Sacko since 2014, plus owner records and regular-season scoring, adjusted so different eras compare fairly.</p>
+  </header>
+
+  <nav class="toc" aria-label="Page sections" data-glean-id="section-nav">
+    <a href="#history" class="active">League history</a>
+    <a href="#owners">Owners</a>
+    <a href="#points">By points</a>
+  </nav>
+
+  <div class="headlines" data-glean-id="headline-strip">
+    <div class="card reveal" data-glean-id="headline-most-titles"><div class="label">Most titles</div><div class="headline-name" id="hlTitles"></div><div class="headline-sub" id="hlTitlesSub"></div></div>
+    <div class="card reveal" style="animation-delay:.06s" data-glean-id="headline-most-sackos"><div class="label red">Most Sackos</div><div class="headline-name" id="hlSackos"></div><div class="headline-sub" id="hlSackosSub"></div></div>
+    <div class="card reveal" style="animation-delay:.12s" data-glean-id="headline-top-scorer"><div class="label green">Best vs league avg <span class="info" tabindex="0" aria-label="How this is calculated">i<span class="tip" role="tooltip">Average of each season's regular-season points compared with that season's league average. 2020 is excluded because the COVID season used different scoring.</span></span></div><div class="headline-name" id="hlScorer"></div><div class="headline-sub" id="hlScorerSub"></div></div>
+  </div>
+
+  <section id="history" data-glean-id="section-history">
+    <div class="section-head">
+      <div><h2>Champions, runner-ups &amp; Sackos</h2><p>Season-by-season results. Pick an owner to spotlight every finish they've had.</p></div>
+      <div class="controls"><label for="ownerPick">Spotlight</label><select id="ownerPick"><option value="">All owners</option></select></div>
+    </div>
+    <div class="table-wrap reveal" data-glean-id="history-table"><table class="history"><thead><tr><th>Year</th><th>Champion</th><th>Owner</th><th>Runner-up</th><th>Owner</th><th>Sacko</th><th>Owner</th><th class="num">Teams</th></tr></thead><tbody id="historyBody"></tbody></table></div>
+    <div class="legend"><span><i class="dot"></i>Champion</span><span><i class="dot silver"></i>Runner-up</span><span><i class="dot red"></i>Sacko (last place)</span></div>
+  </section>
+
+  <section id="owners" data-glean-id="section-owners">
+    <div class="section-head"><div><h2>Owner records</h2><p>Titles, runner-up finishes and Sackos across all <span id="seasonCount"></span> seasons, including the 2020 COVID season.</p></div></div>
+    <div id="ownerGrid" class="owner-grid" data-glean-id="owner-record-grid"></div>
+    <div class="grid3" style="margin-top:14px">
+      <div class="card" data-glean-id="chart-titles"><div class="label">Titles won</div><div id="barTitles" class="bars"></div></div>
+      <div class="card" data-glean-id="chart-runner-ups"><div class="label silver">Runner-up finishes</div><div id="barRunners" class="bars"></div></div>
+      <div class="card" data-glean-id="chart-sackos"><div class="label red">Sacko finishes</div><div id="barSackos" class="bars"></div></div>
+    </div>
+  </section>
+
+  <section id="points" data-glean-id="section-points">
+    <div class="section-head">
+      <div><h2>By points</h2><p>Regular-season scoring, 2014–2026. Scoring has dropped over time, so raw points favor owners who played in the high-scoring early years. Era-adjusted points put every season on the same scale.</p></div>
+      <div class="controls"><span class="count">Show</span><div class="seg" role="group" aria-label="Minimum seasons"><button type="button" data-min="1" aria-pressed="true">All owners</button><button type="button" data-min="5" aria-pressed="false">5+ seasons</button></div></div>
+    </div>
+
+    <div class="grid2">
+      <div class="card" data-glean-id="chart-era-adjusted">
+        <div class="label green">Era-adjusted avg per season <span class="info" tabindex="0" aria-label="How this is calculated">i<span class="tip" role="tooltip">Each season's points × (baseline ÷ that season's league average). A league-average team in any year scores exactly the baseline of <b id="tipBaseline"></b> points. Bars show distance from that baseline.</span></span></div>
+        <div id="barEra" class="bars"></div>
+        <div class="axis" aria-hidden="true"><div></div><div><span id="eraMin"></span><span>baseline</span><span id="eraMax"></span></div><div></div></div>
+      </div>
+      <div class="card" data-glean-id="chart-vs-league-average">
+        <div class="label blue">Avg % vs league average <span class="info" tabindex="0" aria-label="How this is calculated">i<span class="tip" role="tooltip">For each season, the owner's points compared with that season's league average, then averaged across the seasons they played. 0% means exactly average.</span></span></div>
+        <div id="barPct" class="bars"></div>
+        <div class="axis" aria-hidden="true"><div></div><div><span id="pctMin"></span><span>0%</span><span id="pctMax"></span></div><div></div></div>
+      </div>
+    </div>
+
+    <div class="sub-head"><h3>Season by season, era adjusted</h3><div class="count">vs baseline · green above · red below</div></div>
+    <div class="table-wrap" data-glean-id="era-heatmap"><table class="heat"><thead id="heatHead"></thead><tbody id="heatBody"></tbody></table></div>
+    <p class="note">Hover a cell for the team name, raw points and regular-season finish. 2020 isn't shown because the shortened COVID season used a different scoring system.</p>
+
+    <div class="sub-head"><h3>Full scoring table</h3><div class="count">Click a column to sort</div></div>
+    <div class="table-wrap" data-glean-id="scoring-table"><table class="scores"><thead><tr id="scoreHead"></tr></thead><tbody id="scoreBody"></tbody></table></div>
+  </section>
+
+  <footer data-glean-id="footer">
+    <div>Points are regular-season totals from Fantrax standings (playoffs excluded). Owners are matched across seasons even when they changed team names.</div>
+    <div>Updated <span id="asOf"></span>.</div>
+  </footer>
+</div>
+
+<script>
+window.LEAGUE_DATA = {"asOf": "September 2026", "baseline": 8440.0, "history": [{"year": "2014", "champTeam": "Xander's Real Home", "champ": "Mike Chang", "ruTeam": "Fear the Beard", "ru": "Mike Ely", "sackoTeam": "Buster Buster Buster", "sacko": "Steve Kim", "size": 6}, {"year": "2015", "champTeam": "Samurai Blue", "champ": "Takumi Yamamoto", "ruTeam": "Bryce's Bitches", "ru": "Michael Whitney", "sackoTeam": "El Jefe", "sacko": "Jeff Taylor", "size": 8}, {"year": "2016", "champTeam": "El Jefe", "champ": "Jeff Taylor", "ruTeam": "Shocktop Steve", "ru": "Austin Hymes", "sackoTeam": "7th Place or Bust", "sacko": "Mike Ely", "size": 8}, {"year": "2017", "champTeam": "Lincecumback Kids", "champ": "Cole Wilson", "ruTeam": "Pax Klubericana", "ru": "Jeff Taylor", "sackoTeam": "Really Been Getting My Tits Lit Lately", "sacko": "Mike Baratta", "size": 8}, {"year": "2018", "champTeam": "Samurai Blue", "champ": "Takumi Yamamoto", "ruTeam": "Jinxed Myself", "ru": "Mike Ely", "sackoTeam": "Aroldis Chapman Fight Club", "sacko": "Jeff Taylor", "size": 8}, {"year": "2019", "champTeam": "Mean Muggin", "champ": "Mike Ely", "ruTeam": "The Van Wagon", "ru": "Mike Baratta", "sackoTeam": "Samurai Blue", "sacko": "Takumi Yamamoto", "size": 8}, {"year": "2020 - COVID", "champTeam": "Lincecumback Kids", "champ": "Cole Wilson", "ruTeam": "Shocktop Steve", "ru": "Austin Hymes", "sackoTeam": "Co-HEN-19", "sacko": "Mike Baratta", "size": 8}, {"year": "2021", "champTeam": "Urias is in the Jackpot!", "champ": "Mike Baratta", "ruTeam": "El Jefe", "ru": "Jeff Taylor", "sackoTeam": "New York Mess", "sacko": "CJ Pendergast", "size": 8}, {"year": "2022", "champTeam": "Oh Buck! You're Gonna Make Me Believe!", "champ": "Mike Baratta", "ruTeam": "Shocktop Steve", "ru": "Austin Hymes", "sackoTeam": "KeepMyTeamsName OutYourFuckingMouth", "sacko": "Jeff Taylor", "size": 8}, {"year": "2023", "champTeam": "Me & Julio", "champ": "CJ Pendergast", "ruTeam": "Moniak on the Floor", "ru": "Mike Ely", "sackoTeam": "Ham Fighters", "sacko": "Cole Wilson", "size": 8}, {"year": "2024", "champTeam": "Shocktop Steve", "champ": "Austin Hymes", "ruTeam": "Marte Parte", "ru": "Mike Ely", "sackoTeam": "Ham Fighters", "sacko": "Cole Wilson", "size": 8}, {"year": "2025", "champTeam": "Shocktop Steve", "champ": "Austin Hymes", "ruTeam": "Tight Pants Only", "ru": "Theo", "sackoTeam": "The Real Shocktop", "sacko": "Steve Kim", "size": 10}, {"year": "2026", "champTeam": "Old Toby", "champ": "Theo", "ruTeam": "El Jefe", "ru": "Jeff Taylor", "sackoTeam": "Yakult Swallows", "sacko": "Michael Whitney", "size": 10}], "owners": [{"name": "Austin Hymes", "seasons": 12, "total": 104945.4, "avg": 8745.4, "pct": 0.03602, "best": 10096.0, "avgFinish": 3.08, "firstPlace": 3, "years": {"2014": {"adj": 9015.9, "raw": 10096.0, "rank": 1, "team": "Shocktop Steve"}, "2015": {"adj": 8825.3, "raw": 9113.8, "rank": 3, "team": "Shocktop Steve"}, "2016": {"adj": 8837.5, "raw": 9324.8, "rank": 2, "team": "Shocktop Steve"}, "2017": {"adj": 8793.4, "raw": 9589.8, "rank": 3, "team": "Shocktop Steve"}, "2018": {"adj": 8620.0, "raw": 9240.8, "rank": 3, "team": "Shocktop Steve"}, "2019": {"adj": 8127.4, "raw": 8813.5, "rank": 6, "team": "Shocktop Steve"}, "2021": {"adj": 9035.7, "raw": 8512.0, "rank": 3, "team": "Shocktop Steve"}, "2022": {"adj": 8907.8, "raw": 8327.8, "rank": 1, "team": "Shocktop Steve"}, "2023": {"adj": 8362.2, "raw": 8182.8, "rank": 5, "team": "Shocktop Steve"}, "2024": {"adj": 9392.7, "raw": 9085.3, "rank": 1, "team": "Shocktop Steve"}, "2025": {"adj": 8715.0, "raw": 7657.8, "rank": 3, "team": "Shocktop Steve"}, "2026": {"adj": 8295.9, "raw": 7000.7, "rank": 6, "team": "Shocktop Steve"}}, "eraTotal": 104928.6, "eraAvg": 8744.1}, {"name": "CJ Pendergast", "seasons": 6, "total": 45549.6, "avg": 7591.6, "pct": -0.02668, "best": 8506.3, "avgFinish": 5.33, "firstPlace": 0, "years": {"2021": {"adj": 7227.7, "raw": 6808.8, "rank": 8, "team": "New York Mess"}, "2022": {"adj": 8304.2, "raw": 7763.5, "rank": 6, "team": "Team Anderson"}, "2023": {"adj": 8692.7, "raw": 8506.3, "rank": 2, "team": "Me & Julio"}, "2024": {"adj": 8358.9, "raw": 8085.3, "rank": 4, "team": "Last Place Kings"}, "2025": {"adj": 8288.8, "raw": 7283.3, "rank": 7, "team": "LuzarDo or Die"}, "2026": {"adj": 8416.4, "raw": 7102.3, "rank": 5, "team": "Corner Boys"}}, "eraTotal": 49288.7, "eraAvg": 8214.8}, {"name": "Cole Wilson", "seasons": 9, "total": 73080.5, "avg": 8120.1, "pct": -0.01543, "best": 9926.0, "avgFinish": 5.56, "firstPlace": 1, "years": {"2017": {"adj": 9101.6, "raw": 9926.0, "rank": 1, "team": "Lincecumback Kids"}, "2018": {"adj": 8261.8, "raw": 8856.8, "rank": 6, "team": "Lincecumback Kids"}, "2019": {"adj": 8047.8, "raw": 8727.2, "rank": 7, "team": "Lincecumback Kids"}, "2021": {"adj": 7667.9, "raw": 7223.5, "rank": 7, "team": "Lincecumback Kids"}, "2022": {"adj": 8434.9, "raw": 7885.7, "rank": 5, "team": "Ham Fighters"}, "2023": {"adj": 7944.7, "raw": 7774.3, "rank": 8, "team": "Ham Fighters"}, "2024": {"adj": 8292.4, "raw": 8021.0, "rank": 6, "team": "Ham Fighters"}, "2025": {"adj": 8303.4, "raw": 7296.2, "rank": 6, "team": "Ham Fighters"}, "2026": {"adj": 8733.4, "raw": 7369.8, "rank": 4, "team": "Ham Fighters"}}, "eraTotal": 74787.8, "eraAvg": 8309.8}, {"name": "Jeff Taylor", "seasons": 11, "total": 92416.2, "avg": 8401.5, "pct": 0.00739, "best": 9827.5, "avgFinish": 4.18, "firstPlace": 2, "years": {"2015": {"adj": 8130.0, "raw": 8395.8, "rank": 5, "team": "El Jefe"}, "2016": {"adj": 8713.5, "raw": 9194.0, "rank": 3, "team": "El Jefe"}, "2017": {"adj": 9011.3, "raw": 9827.5, "rank": 2, "team": "Pax Klubericana"}, "2018": {"adj": 8091.6, "raw": 8674.3, "rank": 7, "team": "Aroldis Chapman Fight Club"}, "2019": {"adj": 8243.2, "raw": 8939.2, "rank": 5, "team": "El Jefe"}, "2021": {"adj": 9363.1, "raw": 8820.5, "rank": 1, "team": "El Jefe"}, "2022": {"adj": 7674.0, "raw": 7174.3, "rank": 8, "team": "KeepMyTeamsName OutYourFuckinMouth"}, "2023": {"adj": 8602.2, "raw": 8417.7, "rank": 3, "team": "El Jefe"}, "2024": {"adj": 7916.1, "raw": 7657.0, "rank": 8, "team": "Weenie Hut Juniors"}, "2025": {"adj": 8931.4, "raw": 7848.0, "rank": 1, "team": "If the Dick Fitts"}, "2026": {"adj": 8849.5, "raw": 7467.8, "rank": 3, "team": "El Jefe"}}, "eraTotal": 93525.8, "eraAvg": 8502.3}, {"name": "Michael Whitney", "seasons": 6, "total": 50472.9, "avg": 8412.2, "pct": -0.00981, "best": 9988.7, "avgFinish": 5.33, "firstPlace": 1, "years": {"2014": {"adj": 8920.1, "raw": 9988.7, "rank": 2, "team": "Jose"}, "2015": {"adj": 9094.1, "raw": 9391.5, "rank": 1, "team": "Bryce's Bitches"}, "2016": {"adj": 8374.7, "raw": 8836.6, "rank": 4, "team": "Trout + Trash"}, "2017": {"adj": 7826.9, "raw": 8535.8, "rank": 7, "team": "Closed til Spring"}, "2025": {"adj": 8027.4, "raw": 7053.7, "rank": 9, "team": "Big Witt"}, "2026": {"adj": 7900.1, "raw": 6666.7, "rank": 9, "team": "Yakult Swallows"}}, "eraTotal": 50143.3, "eraAvg": 8357.2}, {"name": "Mike Baratta", "seasons": 11, "total": 91363.2, "avg": 8305.7, "pct": -0.00419, "best": 9610.3, "avgFinish": 4.82, "firstPlace": 0, "years": {"2015": {"adj": 8026.4, "raw": 8288.8, "rank": 7, "team": "deGrominant"}, "2016": {"adj": 8121.1, "raw": 8569.0, "rank": 8, "team": "J.A. Fapp"}, "2017": {"adj": 7751.3, "raw": 8453.3, "rank": 8, "team": "Really Been Getting My Tits Lit Lately"}, "2018": {"adj": 8369.2, "raw": 8972.0, "rank": 5, "team": "I wasn't talking about the hot dog..."}, "2019": {"adj": 8862.2, "raw": 9610.3, "rank": 2, "team": "The Van Wagon"}, "2021": {"adj": 9073.7, "raw": 8547.8, "rank": 2, "team": "Urias is in the Jackpot!"}, "2022": {"adj": 8842.8, "raw": 8267.0, "rank": 2, "team": "Oh Buck! You're Gonna Make Me Believe!"}, "2023": {"adj": 8400.8, "raw": 8220.7, "rank": 4, "team": "Oh Buck! You're Gonna Make Me Believe!"}, "2024": {"adj": 8388.2, "raw": 8113.7, "rank": 3, "team": "Lisan al Grimace"}, "2025": {"adj": 8582.8, "raw": 7541.7, "rank": 5, "team": "Lisan al Grimace"}, "2026": {"adj": 8033.0, "raw": 6778.8, "rank": 7, "team": "The Ottosey"}}, "eraTotal": 92451.5, "eraAvg": 8404.7}, {"name": "Mike Chang", "seasons": 6, "total": 54171.1, "avg": 9028.5, "pct": -0.00518, "best": 9315.3, "avgFinish": 4.83, "firstPlace": 0, "years": {"2014": {"adj": 8318.7, "raw": 9315.3, "rank": 4, "team": "Xander's Real Home"}, "2015": {"adj": 8932.1, "raw": 9224.2, "rank": 2, "team": "Hanley's Homies"}, "2016": {"adj": 8203.1, "raw": 8655.5, "rank": 6, "team": "The X-Men"}, "2017": {"adj": 8540.0, "raw": 9313.5, "rank": 5, "team": "The X-Men"}, "2018": {"adj": 8427.5, "raw": 9034.5, "rank": 4, "team": "The X-Men"}, "2019": {"adj": 7956.5, "raw": 8628.2, "rank": 8, "team": "Monor Goodchang"}}, "eraTotal": 50377.9, "eraAvg": 8396.3}, {"name": "Mike Ely", "seasons": 12, "total": 103830.4, "avg": 8652.5, "pct": 0.02502, "best": 9912.5, "avgFinish": 3.67, "firstPlace": 2, "years": {"2014": {"adj": 8852.0, "raw": 9912.5, "rank": 3, "team": "Fear the Beard"}, "2015": {"adj": 8095.5, "raw": 8360.2, "rank": 6, "team": "7th Place or Bust"}, "2016": {"adj": 8122.9, "raw": 8570.8, "rank": 7, "team": "7th Place or Bust"}, "2017": {"adj": 8590.4, "raw": 9368.5, "rank": 4, "team": "Sacko Champions"}, "2018": {"adj": 8805.8, "raw": 9440.0, "rank": 2, "team": "Jinxed Myself"}, "2019": {"adj": 9056.2, "raw": 9820.8, "rank": 1, "team": "Mean Muggin"}, "2021": {"adj": 8555.7, "raw": 8059.8, "rank": 4, "team": "Call JD Martinez - 877-HR-NOW"}, "2022": {"adj": 8698.2, "raw": 8131.8, "rank": 4, "team": "Robbie Ray's Pants"}, "2023": {"adj": 9031.9, "raw": 8838.2, "rank": 1, "team": "Moniak on the Floor"}, "2024": {"adj": 8877.2, "raw": 8586.6, "rank": 2, "team": "Marte Parte"}, "2025": {"adj": 8244.3, "raw": 7244.2, "rank": 8, "team": "Riley Fried's Jizz Chasholm"}, "2026": {"adj": 8884.0, "raw": 7497.0, "rank": 2, "team": "Walker, Texas Rangers"}}, "eraTotal": 103813.9, "eraAvg": 8651.2}, {"name": "Steve Kim", "seasons": 11, "total": 87709.9, "avg": 7973.6, "pct": -0.04756, "best": 9389.7, "avgFinish": 6.91, "firstPlace": 0, "years": {"2014": {"adj": 7601.9, "raw": 8512.7, "rank": 6, "team": "Buster Buster Buster"}, "2015": {"adj": 7640.5, "raw": 7890.3, "rank": 8, "team": "Buster Buster Buster"}, "2016": {"adj": 8269.0, "raw": 8725.0, "rank": 5, "team": "Buster Buster Buster"}, "2018": {"adj": 7925.5, "raw": 8496.3, "rank": 8, "team": "Sacko Anxiety"}, "2019": {"adj": 8658.7, "raw": 9389.7, "rank": 3, "team": "The Real Shocktop"}, "2021": {"adj": 8268.0, "raw": 7788.8, "rank": 6, "team": "The Real Shocktop"}, "2022": {"adj": 7941.6, "raw": 7424.5, "rank": 7, "team": "The Real Shocktop"}, "2023": {"adj": 8274.7, "raw": 8097.3, "rank": 6, "team": "The Real Shocktop"}, "2024": {"adj": 7996.5, "raw": 7734.8, "rank": 7, "team": "The Real Shocktop"}, "2025": {"adj": 7951.6, "raw": 6987.0, "rank": 10, "team": "The Real Shocktop"}, "2026": {"adj": 7896.3, "raw": 6663.5, "rank": 10, "team": "The Real Shocktop"}}, "eraTotal": 88424.4, "eraAvg": 8038.6}, {"name": "Takumi Yamamoto", "seasons": 12, "total": 101282.8, "avg": 8440.2, "pct": -0.00018, "best": 9668.2, "avgFinish": 4.42, "firstPlace": 2, "years": {"2014": {"adj": 7931.4, "raw": 8881.6, "rank": 5, "team": "Samurai Blue"}, "2015": {"adj": 8776.2, "raw": 9063.2, "rank": 4, "team": "Samurai Blue"}, "2016": {"adj": 8878.4, "raw": 9368.0, "rank": 1, "team": "Samurai Blue"}, "2017": {"adj": 7905.3, "raw": 8621.3, "rank": 6, "team": "Samurai Blue"}, "2018": {"adj": 9018.6, "raw": 9668.2, "rank": 1, "team": "Samurai Blue"}, "2019": {"adj": 8568.2, "raw": 9291.5, "rank": 4, "team": "Samurai Blue"}, "2021": {"adj": 8328.3, "raw": 7845.7, "rank": 5, "team": "Samurai Blue"}, "2022": {"adj": 8716.7, "raw": 8149.2, "rank": 3, "team": "Samurai Blue"}, "2023": {"adj": 8210.8, "raw": 8034.7, "rank": 7, "team": "Samurai Blue"}, "2024": {"adj": 8298.1, "raw": 8026.5, "rank": 5, "team": "Samurai Blue"}, "2025": {"adj": 8599.3, "raw": 7556.2, "rank": 4, "team": "Samurai Blue"}, "2026": {"adj": 8030.6, "raw": 6776.8, "rank": 8, "team": "Samurai Blue"}}, "eraTotal": 101261.9, "eraAvg": 8438.5}, {"name": "Theo", "seasons": 2, "total": 15593.2, "avg": 7796.6, "pct": 0.07327, "best": 7899.3, "avgFinish": 1.5, "firstPlace": 1, "years": {"2025": {"adj": 8756.0, "raw": 7693.8, "rank": 2, "team": "Tight Pants Only"}, "2026": {"adj": 9360.8, "raw": 7899.3, "rank": 1, "team": "Old Toby"}}, "eraTotal": 18116.8, "eraAvg": 9058.4}], "seasons": [{"year": 2014, "teams": 6, "leagueAvg": 9451.1, "factor": 0.893}, {"year": 2015, "teams": 8, "leagueAvg": 8716.0, "factor": 0.968}, {"year": 2016, "teams": 8, "leagueAvg": 8905.5, "factor": 0.948}, {"year": 2017, "teams": 8, "leagueAvg": 9204.5, "factor": 0.917}, {"year": 2018, "teams": 8, "leagueAvg": 9047.9, "factor": 0.933}, {"year": 2019, "teams": 8, "leagueAvg": 9152.5, "factor": 0.922}, {"year": 2021, "teams": 8, "leagueAvg": 7950.9, "factor": 1.062}, {"year": 2022, "teams": 8, "leagueAvg": 7890.5, "factor": 1.07}, {"year": 2023, "teams": 8, "leagueAvg": 8259.0, "factor": 1.022}, {"year": 2024, "teams": 8, "leagueAvg": 8163.8, "factor": 1.034}, {"year": 2025, "teams": 10, "leagueAvg": 7416.2, "factor": 1.138}, {"year": 2026, "teams": 10, "leagueAvg": 7122.3, "factor": 1.185}], "years": [2014, 2015, 2016, 2017, 2018, 2019, 2021, 2022, 2023, 2024, 2025, 2026]};
+</script>
+<script>
+(function(){
+  'use strict';
+  var D = window.LEAGUE_DATA;
+  var $ = function(id){ return document.getElementById(id); };
+  function el(tag, cls, text){ var n=document.createElement(tag); if(cls) n.className=cls; if(text!=null) n.textContent=text; return n; }
+  function slug(s){ return String(s).toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,''); }
+  function fmt(n, d){ return Number(n).toLocaleString('en-US',{minimumFractionDigits:d||0,maximumFractionDigits:d||0}); }
+  function fmtPct(n){ var x=n*100; return (x>0?'+':'')+x.toFixed(1)+'%'; }
+  function names(list){ if(list.length<=2) return list.join(' & '); return list.slice(0,-1).join(', ')+' & '+list[list.length-1]; }
+
+  var hist = D.history, owners = D.owners, baseline = D.baseline;
+  $('asOf').textContent = D.asOf;
+  $('seasonCount').textContent = hist.length;
+  $('tipBaseline').textContent = fmt(baseline);
+
+  /* ---------- Records ---------- */
+  var rec = {};
+  function r(n){ if(!rec[n]) rec[n]={name:n,titles:0,runners:0,sackos:0,titleYears:[],sackoYears:[]}; return rec[n]; }
+  owners.forEach(function(o){ r(o.name); });
+  hist.forEach(function(h){
+    var y=h.year.slice(0,4);
+    r(h.champ).titles++; r(h.champ).titleYears.push(y);
+    r(h.ru).runners++;
+    r(h.sacko).sackos++; r(h.sacko).sackoYears.push(y);
+  });
+  var recList = Object.keys(rec).map(function(k){ return rec[k]; });
+  var seasonsByOwner = {};
+  owners.forEach(function(o){ seasonsByOwner[o.name]=o.seasons; });
+
+  /* ---------- Headlines ---------- */
+  function leaders(key){ var m=Math.max.apply(null,recList.map(function(x){return x[key];})); return {max:m,who:recList.filter(function(x){return x[key]===m;}).map(function(x){return x.name;}).sort()}; }
+  var lt=leaders('titles'), ls=leaders('sackos');
+  $('hlTitles').textContent = names(lt.who);
+  $('hlTitlesSub').textContent = (lt.who.length>1 ? lt.who.length+'-way tie at ' : '')+lt.max+' championships';
+  $('hlSackos').textContent = names(ls.who);
+  $('hlSackosSub').textContent = ls.max+' last-place finishes ('+ls.who.map(function(n){return rec[n].sackoYears.join(', ');}).join(' · ')+')';
+  var byPct = owners.slice().sort(function(a,b){return b.pct-a.pct;});
+  var vet = owners.filter(function(o){return o.seasons>=5;}).sort(function(a,b){return b.pct-a.pct;})[0];
+  var top = byPct[0];
+  $('hlScorer').textContent = top.name;
+  $('hlScorerSub').textContent = fmtPct(top.pct)+' vs league avg over '+top.seasons+' season'+(top.seasons===1?'':'s')+(vet && vet.name!==top.name ? ' · '+vet.name+' leads owners with 5+ seasons at '+fmtPct(vet.pct) : '');
+
+  /* ---------- History table ---------- */
+  var pick = $('ownerPick');
+  recList.map(function(x){return x.name;}).sort().forEach(function(n){ var o=el('option',null,n); o.value=n; pick.appendChild(o); });
+  function ownerCell(name, dotCls){
+    var td=el('td'), wrap=el('span','owner-cell'), dot=el('i','dot'+(dotCls?' '+dotCls:''));
+    var nm=el('span','oname',name); nm.dataset.owner=name;
+    wrap.appendChild(dot); wrap.appendChild(nm); td.appendChild(wrap); return td;
+  }
+  function renderHistory(){
+    var body=$('historyBody'); body.innerHTML='';
+    hist.slice().reverse().forEach(function(h){
+      var tr=el('tr'); tr.dataset.gleanId='season-'+slug(h.year);
+      var ty=el('td','year',h.year.slice(0,4));
+      if(h.year.indexOf('COVID')>=0){ ty.appendChild(el('span','tag','COVID')); }
+      tr.appendChild(ty);
+      var c1=el('td','champ team',h.champTeam); tr.appendChild(c1);
+      var c2=ownerCell(h.champ,''); c2.classList.add('champ'); tr.appendChild(c2);
+      var c3=el('td','runner team',h.ruTeam); tr.appendChild(c3);
+      var c4=ownerCell(h.ru,'silver'); c4.classList.add('runner'); tr.appendChild(c4);
+      var c5=el('td','sacko team',h.sackoTeam); tr.appendChild(c5);
+      var c6=ownerCell(h.sacko,'red'); c6.classList.add('sacko'); tr.appendChild(c6);
+      tr.appendChild(el('td','num',h.size));
+      tr.dataset.owners=[h.champ,h.ru,h.sacko].join('|');
+      body.appendChild(tr);
+    });
+  }
+  function applySpotlight(){
+    var who=pick.value;
+    document.querySelectorAll('#historyBody tr').forEach(function(tr){
+      var inRow = who && tr.dataset.owners.split('|').indexOf(who)>=0;
+      tr.classList.toggle('hl', !!inRow);
+      tr.classList.toggle('dim', !!who && !inRow);
+    });
+    document.querySelectorAll('#historyBody .oname').forEach(function(s){ s.classList.toggle('mark', !!who && s.dataset.owner===who); });
+  }
+  renderHistory();
+  pick.addEventListener('change', applySpotlight);
+
+  /* ---------- Owner cards + record bars ---------- */
+  var grid=$('ownerGrid');
+  recList.slice().sort(function(a,b){ return b.titles-a.titles || b.runners-a.runners || a.sackos-b.sackos || a.name.localeCompare(b.name); }).forEach(function(x){
+    var c=el('div','owner'); c.dataset.gleanId='owner-'+slug(x.name);
+    c.appendChild(el('div','n',x.name));
+    var s=seasonsByOwner[x.name];
+    c.appendChild(el('div','meta', x.titleYears.length ? 'Titles: '+x.titleYears.join(', ') : 'No titles yet'));
+    var st=el('div','stats');
+    [['',x.titles,'titles'],['silver',x.runners,'runner-up finishes'],['red',x.sackos,'Sackos']].forEach(function(p){
+      var sp=el('span'); sp.title=p[1]+' '+p[2]; var d=el('i','dot'+(p[0]?' '+p[0]:'')); sp.appendChild(d); sp.appendChild(document.createTextNode(p[1])); st.appendChild(sp);
+    });
+    c.appendChild(st); grid.appendChild(c);
+  });
+  function countBars(id, key, cls){
+    var host=$(id), list=recList.filter(function(x){return x[key]>0;}).sort(function(a,b){return b[key]-a[key]||a.name.localeCompare(b.name);});
+    var max=list.length?list[0][key]:1;
+    list.forEach(function(x){
+      var row=el('div','bar-row'); row.dataset.gleanId=id+'-'+slug(x.name);
+      row.appendChild(el('div','bar-name',x.name));
+      var t=el('div','track'), f=el('div','fill'+(cls?' '+cls:'')); f.dataset.w=(x[key]/max*100).toFixed(1); t.appendChild(f); row.appendChild(t);
+      row.appendChild(el('div','bar-val',x[key])); host.appendChild(row);
+    });
+  }
+  countBars('barTitles','titles','');
+  countBars('barRunners','runners','silver');
+  countBars('barSackos','sackos','red');
+
+  /* ---------- Points ---------- */
+  var minSeasons = 1;
+  function divergingBars(id, list, valFn, labelFn, scale){
+    var host=$(id); host.innerHTML='';
+    list.forEach(function(o){
+      var v=valFn(o), w=Math.min(50,Math.abs(v)/scale*50);
+      var row=el('div','bar-row wide'); row.dataset.gleanId=id+'-'+slug(o.name);
+      var nm=el('div','bar-name',o.name); nm.appendChild(el('small',null,o.seasons+' yr'+(o.seasons===1?'':'s'))); row.appendChild(nm);
+      var t=el('div','track div'), f=el('div','fill '+(v>=0?'pos':'neg'));
+      f.style.left=(v>=0?50:50-w)+'%'; f.dataset.w=w.toFixed(2); t.appendChild(f); row.appendChild(t);
+      row.appendChild(el('div','bar-val '+(v>=0?'pos-t':'neg-t'),labelFn(o))); host.appendChild(row);
+    });
+    requestAnimationFrame(function(){ host.querySelectorAll('.fill').forEach(function(f){ f.style.width=f.dataset.w+'%'; }); });
+  }
+  function visibleOwners(){ return owners.filter(function(o){ return o.seasons>=minSeasons; }); }
+  function renderPoints(){
+    var list=visibleOwners();
+    var era=list.slice().sort(function(a,b){return b.eraAvg-a.eraAvg;});
+    var eraScale=Math.max.apply(null,owners.map(function(o){return Math.abs(o.eraAvg-baseline);}));
+    eraScale=Math.ceil(eraScale/100)*100;
+    divergingBars('barEra',era,function(o){return o.eraAvg-baseline;},function(o){return fmt(o.eraAvg);},eraScale);
+    $('eraMin').textContent=fmt(baseline-eraScale); $('eraMax').textContent=fmt(baseline+eraScale);
+    var pct=list.slice().sort(function(a,b){return b.pct-a.pct;});
+    var pScale=Math.max.apply(null,owners.map(function(o){return Math.abs(o.pct);}));
+    pScale=Math.ceil(pScale*100)/100;
+    divergingBars('barPct',pct,function(o){return o.pct;},function(o){return fmtPct(o.pct);},pScale);
+    $('pctMin').textContent='−'+(pScale*100).toFixed(0)+'%'; $('pctMax').textContent='+'+(pScale*100).toFixed(0)+'%';
+    renderHeat(era);
+    renderScores();
+  }
+
+  function renderHeat(list){
+    var head=$('heatHead'), body=$('heatBody'); head.innerHTML=''; body.innerHTML='';
+    var tr=el('tr'); tr.appendChild(el('th',null,'Owner'));
+    D.years.forEach(function(y){ tr.appendChild(el('th',null,"'"+String(y).slice(2))); });
+    tr.appendChild(el('th',null,'Avg')); head.appendChild(tr);
+    list.forEach(function(o){
+      var row=el('tr'); row.dataset.gleanId='heat-'+slug(o.name);
+      row.appendChild(el('td',null,o.name));
+      D.years.forEach(function(y){
+        var s=o.years[String(y)];
+        if(!s){ row.appendChild(el('td','cell empty','·')); return; }
+        var diff=s.adj/baseline-1, a=Math.min(1,Math.abs(diff)/0.12);
+        var td=el('td','cell',fmt(s.adj/1000,1)+'k');
+        var tone=diff>=0?'var(--artifact-green)':'var(--artifact-red)';
+        td.style.background='color-mix(in srgb, '+tone+' '+Math.round(a*38)+'%, transparent)';
+        td.title=y+' · '+s.team+'\nFinished #'+s.rank+' in the regular season\nRaw: '+fmt(s.raw,1)+' · Era-adjusted: '+fmt(s.adj,1)+' ('+fmtPct(diff)+' vs baseline)';
+        row.appendChild(td);
+      });
+      var avg=el('td','cell avg '+(o.eraAvg>=baseline?'pos-t':'neg-t'),fmt(o.eraAvg)); row.appendChild(avg);
+      body.appendChild(row);
+    });
+  }
+
+  var cols=[
+    {k:'name',t:'Owner',num:false,f:function(o){return o.name;}},
+    {k:'seasons',t:'Seasons',num:true,f:function(o){return o.seasons;}},
+    {k:'eraAvg',t:'Era-adj avg',num:true,f:function(o){return fmt(o.eraAvg);}},
+    {k:'pct',t:'vs league avg',num:true,f:function(o){return fmtPct(o.pct);}},
+    {k:'avg',t:'Raw avg',num:true,f:function(o){return fmt(o.avg);}},
+    {k:'total',t:'Raw total',num:true,f:function(o){return fmt(o.total);}},
+    {k:'best',t:'Best season',num:true,f:function(o){return fmt(o.best,1);}},
+    {k:'avgFinish',t:'Avg finish',num:true,f:function(o){return o.avgFinish.toFixed(1);},asc:true},
+    {k:'firstPlace',t:'#1 reg. season',num:true,f:function(o){return o.firstPlace;}}
+  ];
+  var sortKey='eraAvg', sortDir=-1;
+  function renderScores(){
+    var head=$('scoreHead'); head.innerHTML='';
+    var rk=el('th',null,'#'); head.appendChild(rk);
+    cols.forEach(function(c){
+      var th=el('th',c.num?'num':null); var b=el('button',null,c.t); b.type='button';
+      if(c.k===sortKey) th.setAttribute('aria-sort',sortDir<0?'descending':'ascending');
+      b.addEventListener('click',function(){
+        if(sortKey===c.k){ sortDir=-sortDir; } else { sortKey=c.k; sortDir=c.num?(c.asc?1:-1):1; }
+        renderScores();
+      });
+      th.appendChild(b); head.appendChild(th);
+    });
+    var list=visibleOwners().slice().sort(function(a,b){
+      var av=a[sortKey], bv=b[sortKey];
+      if(typeof av==='string') return av.localeCompare(bv)*sortDir;
+      return (av-bv)*sortDir || a.name.localeCompare(b.name);
+    });
+    var body=$('scoreBody'); body.innerHTML='';
+    list.forEach(function(o,i){
+      var tr=el('tr'); tr.dataset.gleanId='score-'+slug(o.name);
+      tr.appendChild(el('td','rank',i+1));
+      cols.forEach(function(c){
+        var td=el('td',c.num?'num':null,c.f(o));
+        if(c.k==='name') td.style.fontWeight='600';
+        if(c.k==='pct') td.classList.add(o.pct>=0?'pos-t':'neg-t');
+        if(c.k==='eraAvg') td.classList.add(o.eraAvg>=baseline?'pos-t':'neg-t');
+        tr.appendChild(td);
+      });
+      body.appendChild(tr);
+    });
+  }
+  document.querySelectorAll('.seg button').forEach(function(b){
+    b.addEventListener('click',function(){
+      minSeasons=Number(b.dataset.min);
+      document.querySelectorAll('.seg button').forEach(function(x){ x.setAttribute('aria-pressed', String(x===b)); });
+      renderPoints();
+    });
+  });
+  renderPoints();
+
+  /* ---------- Bar animation + scroll spy ---------- */
+  requestAnimationFrame(function(){ document.querySelectorAll('#owners .fill').forEach(function(f){ f.style.width=f.dataset.w+'%'; }); });
+  var links=document.querySelectorAll('nav.toc a');
+  function spy(){
+    var y=window.scrollY+120, cur='history';
+    ['history','owners','points'].forEach(function(id){ var s=$(id); if(s && s.offsetTop<=y) cur=id; });
+    if(window.innerHeight+window.scrollY>=document.body.scrollHeight-4) cur='points';
+    links.forEach(function(a){ a.classList.toggle('active', a.getAttribute('href')==='#'+cur); });
+  }
+  window.addEventListener('scroll', spy, {passive:true}); spy();
+})();
+</script>
+<script>
+(function(){
+  /* Adds "Export as PDF" when previewed inside Glean; does nothing on a public website. */
+  var GB = window.GleanBridge;
+  if (!GB || typeof GB.postMessage !== 'function') return;
+  GB.postMessage({ actionId:'export-pdf', type:'glean-add-menu', metadata:{ label:'Export as PDF', icon:'export' } });
+  if (typeof GB.onMessage === 'function') GB.onMessage('action', function(data){ if (data && data.actionId === 'export-pdf') window.print(); });
+})();
+</script>
+</body>
+</html>
